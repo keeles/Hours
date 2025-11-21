@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/keeles/hours/add"
+	"github.com/keeles/hours/delete"
 	"github.com/keeles/hours/get"
 	"github.com/keeles/hours/list"
 	"github.com/keeles/hours/new"
@@ -16,4 +17,5 @@ type Hours struct {
 	Add add.Options `cmd:"" short:"a" help:"Add hours to an existing project - hours add <project> <hours>"`
 	Remove remove.Options `cmd:"" aliases:"rm" help:"Remove hours from an existing project - hours remove <project> <hours>"`
 	List list.Options `cmd:"" aliases:"ls" help:"List all projects with hour tracking"`
+	Delete delete.Options `cmd:"" aliases:"d" help:"Delete a project and its hours"`
 }
