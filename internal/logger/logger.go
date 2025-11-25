@@ -12,13 +12,19 @@ func ProjectNotFound(name string) {
 }
 
 func FileNotExists() {
-	pathname := lib.GetDataPath()
-	fmt.Fprintf(os.Stderr, "Error, could not find json file at %v", pathname)
+	pathname, err := lib.GetDBPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v", err)
+	}
+	fmt.Fprintf(os.Stderr, "Error, could not find database at %v", pathname)
 }
 
 func ErrorWritingFile() {
-	pathname := lib.GetDataPath()
-	fmt.Fprintf(os.Stderr, "Error, could not write to json file at %v", pathname)
+	pathname, err := lib.GetDBPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v", err)
+	}
+	fmt.Fprintf(os.Stderr, "Error, could not write to database at %v", pathname)
 }
 
 func ProjectAlreadyExists(name string) {

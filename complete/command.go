@@ -1,4 +1,4 @@
-package delete
+package complete
 
 import (
 	"fmt"
@@ -9,12 +9,12 @@ import (
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.DeleteClient(o.Name)
+	err := lib.DeleteTask(o.Client, o.Task)
 	if err != nil {
-		logger.ErrorWritingFile()
+		logger.ProjectNotFound(o.Task)
 		return nil
 	}
 
-	fmt.Printf("Deleted Client: %v \n", o.Name)
+	fmt.Printf("Deleted Task: %v \n", o.Task)
 	return nil
 }

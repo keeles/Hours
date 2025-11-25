@@ -2,7 +2,6 @@ package get
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/keeles/hours/internal/lib"
 	"github.com/keeles/hours/internal/logger"
@@ -10,17 +9,14 @@ import (
 	"github.com/alecthomas/kong"
 )
 
-func (o Options) Run (ctx *kong.Context) error {
-	data, err := lib.ReadFile()
+func (o Options) Run(ctx *kong.Context) error {
+	tasks, err := lib.GetClientTasks(o.Name)
 	if err != nil {
-		logger.FileNotExists()
-		return nil
-	}
-	project := data[strings.ToLower(o.Name)]
-	if (lib.Project{} == project) {
 		logger.ProjectNotFound(o.Name)
 		return nil
 	}
-	fmt.Printf("%v: %d hours\n", project.Name, project.Hours)
+	for name, hours := range tasks {
+		fmt.Printf("%v: %d hours\n", name, hours)
+	}
 	return nil
 }
