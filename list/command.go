@@ -20,8 +20,9 @@ func (o Options) Run(ctx *kong.Context) error {
 	for client, tasks := range data {
 		fmt.Printf("%v: \n", client)
 		for task, hours := range tasks {
-			fmt.Printf(" |- %v: %d hours\n", task, hours)
+			fmt.Printf("  %v: %d hours\n", task, hours)
 		}
+		fmt.Println("")
 	}
 	return nil
 }
