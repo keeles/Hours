@@ -19,7 +19,7 @@ func main() {
 			NoExpandSubcommands: true,
 		}),
 		kong.Vars{
-			"versionNumber": "1.0.0",
+			"versionNumber": "1.0.1",
 		},
 	)
 	if err := ctx.Run(); err != nil {

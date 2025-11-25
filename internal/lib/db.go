@@ -46,6 +46,11 @@ func InitDb() (*sql.DB, error) {
 		return nil, err
 	}
 
+	_, err = db.Exec(`PRAGMA foreign_keys = ON;`)
+	if err != nil {
+		return nil, err
+	}
+
 	schema := `
 	CREATE TABLE IF NOT EXISTS clients (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
