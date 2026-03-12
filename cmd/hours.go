@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/keeles/hours/add"
-	"github.com/keeles/hours/complete"
-	"github.com/keeles/hours/delete"
-	"github.com/keeles/hours/get"
-	"github.com/keeles/hours/list"
-	"github.com/keeles/hours/new"
-	"github.com/keeles/hours/remove"
-	"github.com/keeles/hours/task"
-	"github.com/keeles/hours/version"
+	"github.com/keeles/hours/cli/add"
+	"github.com/keeles/hours/cli/complete"
+	"github.com/keeles/hours/cli/delete"
+	"github.com/keeles/hours/cli/get"
+	"github.com/keeles/hours/cli/list"
+	"github.com/keeles/hours/cli/new"
+	"github.com/keeles/hours/cli/remove"
+	"github.com/keeles/hours/cli/task"
+	"github.com/keeles/hours/cli/version"
 )
 
 type Hours struct {
