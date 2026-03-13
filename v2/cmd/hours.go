@@ -1,0 +1,25 @@
+package main
+
+import (
+	"github.com/keeles/hours/v2/cli/add"
+	"github.com/keeles/hours/v2/cli/complete"
+	"github.com/keeles/hours/v2/cli/delete"
+	"github.com/keeles/hours/v2/cli/get"
+	"github.com/keeles/hours/v2/cli/list"
+	"github.com/keeles/hours/v2/cli/new"
+	"github.com/keeles/hours/v2/cli/remove"
+	"github.com/keeles/hours/v2/cli/task"
+	"github.com/keeles/hours/v2/cli/version"
+)
+
+type Hours struct {
+	Version  version.Options  `cmd:"" aliases:"v" help:"Print Version Number"`
+	New      new.Options      `cmd:"" aliases:"n" help:"Add a new client for hour tracking"`
+	Task     task.Options     `cmd:"" aliases:"t" help:"Add new task to client - hours task <client-name> <task-name>"`
+	Get      get.Options      `cmd:"" aliases:"g" help:"Get the tasks for a given client name"`
+	Add      add.Options      `cmd:"" aliases:"a" help:"Add hours to an existing project - hours add <client-name> <task> <hours>"`
+	Remove   remove.Options   `cmd:"" aliases:"rm" help:"Remove hours from an existing project - hours remove <client-name> <task> <hours>"`
+	List     list.Options     `cmd:"" aliases:"ls" help:"List all projects with hour tracking"`
+	Delete   delete.Options   `cmd:"" aliases:"d" help:"Delete a client and ALL tasks - hours delete <client-name>"`
+	Complete complete.Options `cmd:"" help:"Complete task and delete it from the database - hours complete <client-name> <task>"`
+}
