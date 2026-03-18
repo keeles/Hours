@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "modernc.org/sqlite"
 )
@@ -17,6 +18,12 @@ type Project struct {
 }
 
 type Tasks map[string]int
+
+type Timer struct {
+	ClientName string
+	TaskName   *string // pointer = optional
+	StartTime  time.Time
+}
 
 const SchemaVersion = 2
 
@@ -71,7 +78,7 @@ func InitDb() (*sql.DB, error) {
 		name TEXT NOT NULL,
 		minutes INTEGER DEFAULT 0,
 		FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
-		UNIQUE(client_id, name)
+		UNIQUE(id, name)
 	);
 
 	-- Only ONE active timer allowed

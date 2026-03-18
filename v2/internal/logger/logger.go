@@ -3,6 +3,7 @@ package logger
 import (
 	"fmt"
 	"os"
+	"time"
 
 	db "github.com/keeles/hours/v2/internal/database"
 )
@@ -33,4 +34,11 @@ func ProjectAlreadyExists(name string) {
 
 func PrintVersion(version string) {
 	fmt.Printf("Current Hours version: %v \n", version)
+}
+
+func PrintTimer(clientName string, time time.Time, taskName *string) {
+	fmt.Printf("Current Timer: %s - %s \n", clientName, time)
+	if *taskName != "" {
+		fmt.Printf("Task Selected: %s \n", *taskName)
+	}
 }

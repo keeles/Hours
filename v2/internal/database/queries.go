@@ -1,6 +1,12 @@
 package database
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+	"time"
+
+	"github.com/manifoldco/promptui"
+)
 
 func AddNewClient(name string) error {
 	db, err := InitDb()
@@ -190,4 +196,239 @@ func UpdateTaskMinutes(clientName, taskName string, newMinutes float32, subtract
 	}
 
 	return nil
+}
+
+func GetTimer() (Timer, bool, error) {
+	db, err := InitDb()
+	if err != nil {
+		return Timer{}, false, err
+	}
+	defer db.Close()
+
+	var startTime string
+	var client string
+	var task sql.NullString
+
+	err = db.QueryRow(`
+		SELECT a.start_time, c.name, t.name FROM active_timer AS a LEFT JOIN clients AS c ON a.client_id = c.id LEFT JOIN tasks as t on a.task_id = t.id
+	`).Scan(&startTime, &client, &task)
+
+	if err == sql.ErrNoRows {
+		return Timer{}, false, nil
+	}
+
+	if err != nil {
+		return Timer{}, false, err
+	}
+
+	parsedTime, err := time.Parse(time.RFC3339, startTime)
+	if err != nil {
+		return Timer{}, false, err
+	}
+
+	var taskPtr *string
+	if task.Valid {
+		taskPtr = &task.String
+	}
+
+	data := Timer{
+		ClientName: client,
+		TaskName:   taskPtr,
+		StartTime:  parsedTime,
+	}
+
+	return data, true, nil
+}
+
+func StartTimer(clientName, taskName string) error {
+	db, err := InitDb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	startTime := time.Now().UTC().Format(time.RFC3339)
+	var query string
+	var args []any
+
+	var id int
+	_ = db.QueryRow(`
+		SELECT id FROM tasks 
+		JOIN clients ON tasks.client_id = clients.id 
+		WHERE tasks.name = ? 
+		AND clients.name = ?
+	`, taskName, clientName).Scan(&id)
+
+	if taskName != "" {
+		query = `
+		INSERT INTO active_timer (id, client_id, task_id, start_time)
+		VALUES (
+			1,
+			(SELECT id FROM clients WHERE name = ?),
+			(SELECT tasks.id 
+				FROM tasks
+				JOIN clients ON tasks.client_id = clients.id
+				WHERE tasks.name = ? AND clients.name = ?
+			),
+			?
+		)
+		`
+		args = []any{clientName, taskName, clientName, startTime}
+
+	} else {
+		query = `
+		INSERT INTO active_timer (id, client_id, task_id, start_time)
+		VALUES (
+			1,
+			(SELECT clients.id FROM clients WHERE clients.name = ?),
+			NULL,
+			?
+		)
+		`
+		args = []any{clientName, startTime}
+	}
+
+	result, err := db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("failed to start timer: client or task not found")
+	}
+
+	return nil
+}
+
+func StopTimer(clientName, taskName string) error {
+	db, err := InitDb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	var startTimeStr string
+	var taskID sql.NullInt64
+	var clientID int
+
+	err = db.QueryRow(`
+		SELECT client_id, task_id, start_time
+		FROM active_timer
+		WHERE id = 1
+	`).Scan(&clientID, &taskID, &startTimeStr)
+
+	if err != nil {
+		return err
+	}
+
+	startTime, err := time.Parse(time.RFC3339, startTimeStr)
+	if err != nil {
+		return err
+	}
+
+	endTime := time.Now().UTC()
+	duration := endTime.Sub(startTime)
+	minutes := int(duration.Minutes())
+
+	if minutes <= 0 {
+		_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
+		if err != nil {
+			return err
+		}
+
+		return fmt.Errorf("Timer running for less than 1 minute, no time allocated")
+	}
+
+	var finalTaskID int
+
+	if !taskID.Valid {
+		taskName, err = SelectTaskForClient(clientName)
+		if err != nil {
+			return err
+		}
+
+		err = db.QueryRow(`
+			SELECT id FROM tasks
+			WHERE name = ?
+			AND client_id = ?
+		`, taskName, clientID).Scan(&finalTaskID)
+
+		if err == sql.ErrNoRows {
+			res, err := db.Exec(`
+				INSERT INTO tasks (client_id, name, minutes)
+				VALUES (?, ?, 0)
+			`, clientID, taskName)
+			if err != nil {
+				return err
+			}
+
+			id, err := res.LastInsertId()
+			if err != nil {
+				return err
+			}
+
+			finalTaskID = int(id)
+
+		} else if err != nil {
+			return err
+		}
+	} else {
+		finalTaskID = int(taskID.Int64)
+	}
+
+	_, err = db.Exec(`
+		INSERT INTO time_entries (task_id, start_time, end_time, minutes)
+		VALUES (?, ?, ?, ?)
+	`,
+		finalTaskID,
+		startTime.Format(time.RFC3339),
+		endTime.Format(time.RFC3339),
+		minutes,
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`
+		UPDATE tasks
+		SET minutes = minutes + ?
+		WHERE id = ?
+	`, minutes, finalTaskID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SelectTaskForClient(clientName string) (string, error) {
+	tasks, err := GetClientTasks(clientName)
+	if err != nil {
+		return "", err
+	}
+	taskNames := []string{}
+	for name := range tasks {
+		taskNames = append(taskNames, name)
+	}
+	prompt := promptui.Select{
+		Label: "Select task for time allocation",
+		Items: taskNames,
+	}
+	_, result, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+	fmt.Printf("Selected task: %s", result)
+
+	return result, nil
 }

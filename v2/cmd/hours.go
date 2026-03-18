@@ -8,14 +8,20 @@ import (
 	"github.com/keeles/hours/v2/cli/list"
 	"github.com/keeles/hours/v2/cli/new"
 	"github.com/keeles/hours/v2/cli/remove"
+	"github.com/keeles/hours/v2/cli/start"
+	"github.com/keeles/hours/v2/cli/stop"
 	"github.com/keeles/hours/v2/cli/task"
+	"github.com/keeles/hours/v2/cli/time"
 	"github.com/keeles/hours/v2/cli/version"
 )
 
 type Hours struct {
 	Version  version.Options  `cmd:"" aliases:"v" help:"Print Version Number"`
 	New      new.Options      `cmd:"" aliases:"n" help:"Add a new client for hour tracking"`
+	Start    start.Options    `cmd:"" aliases:"s" help:"Start a timer for working task for client - hours start <client-name> <task-name>"`
+	Stop     stop.Options     `cmd:"" aliases:"s" help:"Stop the timer for working task - hours stop <client-name> <task-name>"`
 	Task     task.Options     `cmd:"" aliases:"t" help:"Add new task to client - hours task <client-name> <task-name>"`
+	Time     time.Options     `cmd:"" aliases:"t" help:"Show the active timer"`
 	Get      get.Options      `cmd:"" aliases:"g" help:"Get the tasks for a given client name"`
 	Add      add.Options      `cmd:"" aliases:"a" help:"Add hours to an existing project - hours add <client-name> <task> <hours>"`
 	Remove   remove.Options   `cmd:"" aliases:"rm" help:"Remove hours from an existing project - hours remove <client-name> <task> <hours>"`
