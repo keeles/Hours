@@ -8,7 +8,7 @@ import (
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := db.UpdateTaskMinutes(o.Name, o.Task, o.NewHours, false)
+	err := db.UpdateTaskMinutes(o.Name, o.Task, o.NewMinutes, false)
 	if err != nil {
 		logger.ErrorWritingFile()
 		return nil

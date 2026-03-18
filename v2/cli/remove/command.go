@@ -10,12 +10,12 @@ import (
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := db.UpdateTaskMinutes(o.Name, o.Task, o.HoursToRemove, true)
+	err := db.UpdateTaskMinutes(o.Name, o.Task, o.MinutesToRemove, true)
 	if err != nil {
 		logger.ErrorWritingFile()
 		return nil
 	}
 
-	fmt.Printf("Removed %v minutes from %s", o.HoursToRemove, o.Task)
+	fmt.Printf("Removed %v minutes from %s", o.MinutesToRemove, o.Task)
 	return nil
 }
