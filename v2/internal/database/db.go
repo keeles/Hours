@@ -45,7 +45,6 @@ func GetDBPath() (string, error) {
 }
 
 func InitDb() (*sql.DB, error) {
-
 	dbPath, err := GetDBPath()
 	if err != nil {
 		return nil, err

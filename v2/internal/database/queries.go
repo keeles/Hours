@@ -36,6 +36,27 @@ func AddNewTask(clientName, name string) error {
 	return err
 }
 
+func ClientExists(clientName string) (bool, error) {
+	db, err := InitDb()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	var exists bool
+	err = db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM clients WHERE name = ?
+		)
+	`, clientName).Scan(&exists)
+
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
 func GetClientTasks(clientName string) (Tasks, error) {
 	db, err := InitDb()
 	if err != nil {

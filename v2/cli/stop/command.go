@@ -7,7 +7,6 @@ import (
 	db "github.com/keeles/hours/v2/internal/database"
 )
 
-// TODO:
 func (o Options) Run(ctx *kong.Context) error {
 	_, exists, err := db.GetTimer()
 	if err != nil {
