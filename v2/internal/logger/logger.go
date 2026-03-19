@@ -36,9 +36,12 @@ func PrintVersion(version string) {
 	fmt.Printf("Current Hours version: %v \n", version)
 }
 
-func PrintTimer(clientName string, time time.Time, taskName *string) {
-	fmt.Printf("Current Timer: %s - %s \n", clientName, time)
-	if *taskName != "" {
-		fmt.Printf("Task Selected: %s \n", *taskName)
+func PrintTimer(clientName string, timer time.Time, taskName *string) {
+	endTime := time.Now().UTC()
+	duration := endTime.Sub(timer)
+	minutes := int(duration.Minutes())
+	fmt.Printf("Current Timer: %s - %d minutes \n", clientName, minutes)
+	if taskName != nil {
+		fmt.Printf("Task Selected: %d \n", taskName)
 	}
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/keeles/hours/v2/cli/add"
 	"github.com/keeles/hours/v2/cli/complete"
+	"github.com/keeles/hours/v2/cli/config"
 	"github.com/keeles/hours/v2/cli/delete"
 	"github.com/keeles/hours/v2/cli/get"
 	"github.com/keeles/hours/v2/cli/list"
@@ -17,6 +18,7 @@ import (
 
 type Hours struct {
 	Version  version.Options  `cmd:"" aliases:"v" help:"Print Version Number"`
+	Config   config.Options   `cmd:"" aliases:"conf" help:"Commands for configurations"`
 	New      new.Options      `cmd:"" aliases:"n" help:"Add a new client for hour tracking"`
 	Start    start.Options    `cmd:"" aliases:"s" help:"Start a timer for working task for client - hours start <client-name> <task-name>"`
 	Stop     stop.Options     `cmd:"" aliases:"s" help:"Stop the timer for working task - hours stop <client-name> <task-name>"`

@@ -1,9 +1,9 @@
 package config
 
 type Options struct {
-	AddDirectory    AddDirectoryOptions    `cmd:"" help:"Associate current directory with a client"`
-	RemoveDirectory RemoveDirectoryOptions `cmd:"" help:"Remove current directory association"`
-	List            ListOptions            `cmd:"" help:"List configured directories"`
+	AddDirectory    AddDirectoryOptions    `cmd:"" aliases:"add-dir" help:"Associate current directory with a client - hours config add-directory <client-name>"`
+	RemoveDirectory RemoveDirectoryOptions `cmd:"" aliases:"rm-dir" help:"Remove current directory association - hours config remove-directory <client-name>"`
+	List            ListOptions            `cmd:"" aliases:"ls" help:"List configured directories"`
 }
 
 type AddDirectoryOptions struct {

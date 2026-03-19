@@ -139,3 +139,27 @@ func RemoveDirectoryOfClient(clientName string) error {
 	return WriteFile(config)
 }
 
+func GetClientNameForCurrentDirectory() (string, bool) {
+	currentDirectory, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error reading current directory")
+		return "", false
+	}
+	config, err := ReadFile()
+	if err != nil {
+		return "", false
+	}
+
+	absPath, err := filepath.Abs(currentDirectory)
+	if err != nil {
+		return "", false
+	}
+
+	if _, ok := config.Directories[absPath]; ok {
+		clientName := config.Directories[absPath]
+		return clientName, true
+	}
+
+	fmt.Printf("No client associated with %s \n", currentDirectory)
+	return "", false
+}

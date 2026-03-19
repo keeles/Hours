@@ -437,19 +437,31 @@ func SelectTaskForClient(clientName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	index := -1
 	taskNames := []string{}
 	for name := range tasks {
 		taskNames = append(taskNames, name)
 	}
-	prompt := promptui.Select{
-		Label: "Select task for time allocation",
-		Items: taskNames,
+	prompt := promptui.SelectWithAdd{
+		Label:    "Select task for time allocation",
+		Items:    taskNames,
+		AddLabel: "New Task",
 	}
-	_, result, err := prompt.Run()
+	index, result, err := prompt.Run()
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Selected task: %s", result)
 
+	if index == -1 {
+		err = AddNewTask(clientName, result)
+		if err != nil {
+			return "", err
+		}
+
+		fmt.Printf("Created new task: %s \n", result)
+		return result, nil
+	}
+
+	fmt.Printf("Selected task: %s \n", result)
 	return result, nil
 }

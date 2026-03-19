@@ -5,10 +5,21 @@ import (
 
 	"github.com/alecthomas/kong"
 	db "github.com/keeles/hours/v2/internal/database"
+	"github.com/keeles/hours/v2/internal/lib"
 	"github.com/keeles/hours/v2/internal/logger"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
+	client := o.Client
+	if client == "" {
+		clientName, exists := lib.GetClientNameForCurrentDirectory()
+		if !exists {
+			fmt.Println("No client associated with current directory")
+			return nil
+		}
+		client = clientName
+	}
+
 	timer, exists, err := db.GetTimer()
 	if err != nil {
 		fmt.Printf("Database connection error: %s", err)
@@ -21,11 +32,12 @@ func (o Options) Run(ctx *kong.Context) error {
 		return nil
 	}
 
-	err = db.StartTimer(o.Client, o.Task)
+	err = db.StartTimer(client, o.Task)
 	if err != nil {
 		fmt.Printf("Error starting timer: %s \n", err)
 		return nil
 	}
 
+	fmt.Printf("Starting timer for %s \n", client)
 	return nil
 }
