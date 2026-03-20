@@ -42,7 +42,6 @@ func InitDb() (*sql.DB, error) {
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
-		fmt.Println("Failing Here")
 		return nil, err
 	}
 
@@ -52,6 +51,15 @@ func InitDb() (*sql.DB, error) {
 	}
 
 	schema := `
+	CREATE TABLE IF NOT EXISTS schema_version (
+		id INTEGER PRIMARY KEY CHECK (id = 1),
+		version INTEGER NOT NULL
+	);
+
+	INSERT INTO schema_version (id, version)
+	SELECT 1, 1
+	WHERE NOT EXISTS (SELECT 1 FROM schema_version WHERE id = 1);
+
 	CREATE TABLE IF NOT EXISTS clients (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT UNIQUE NOT NULL	
