@@ -1,11 +1,12 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
-func runMigrations(db *sql.DB, current int) error {
-
+func RunMigrations(db *sql.DB, current int) error {
 	if current < 2 {
-
 		// v1 stored hours instead of minutes
 		_, err := db.Exec(`
 			ALTER TABLE tasks ADD COLUMN minutes INTEGER DEFAULT 0;
@@ -30,14 +31,14 @@ func runMigrations(db *sql.DB, current int) error {
 	return nil
 }
 
-func ensureSchemaVersion(db *sql.DB) error {
-
+func EnsureSchemaVersion(db *sql.DB) error {
 	var version int
 
 	err := db.QueryRow(`SELECT version FROM schema_version LIMIT 1`).Scan(&version)
+	fmt.Println(version)
+	fmt.Println(err)
 
 	if err == sql.ErrNoRows {
-
 		// Fresh install
 		_, err := db.Exec(`INSERT INTO schema_version(version) VALUES (?)`, SchemaVersion)
 		return err
@@ -49,7 +50,9 @@ func ensureSchemaVersion(db *sql.DB) error {
 	}
 
 	if version < SchemaVersion {
-		return runMigrations(db, version)
+		fmt.Println("Old database version detected, running migrations")
+		fmt.Println(version)
+		return RunMigrations(db, version)
 	}
 
 	return nil

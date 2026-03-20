@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/alecthomas/kong"
 	db "github.com/keeles/hours/v2/internal/database"
@@ -45,5 +46,20 @@ func (o RemoveDirectoryOptions) Run(ctx *kong.Context) error {
 }
 
 func (o ListOptions) Run(ctx *kong.Context) error {
+	data, err := lib.ReadFile()
+	if err != nil {
+		fmt.Printf("Error, could not read config file: %s", err)
+		return nil
+	}
+
+	home, _ := os.UserHomeDir()
+
+	fmt.Println("")
+	for dir, client := range data.Directories {
+		if home != "" {
+			dir = strings.Replace(dir, home, "~", 1)
+		}
+		fmt.Printf("Client:\t\t\t%s\nProject Directory:\t%s\n\n", client, dir)
+	}
 	return nil
 }
