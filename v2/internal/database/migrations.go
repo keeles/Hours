@@ -35,8 +35,6 @@ func EnsureSchemaVersion(db *sql.DB) error {
 	var version int
 
 	err := db.QueryRow(`SELECT version FROM schema_version LIMIT 1`).Scan(&version)
-	fmt.Println(version)
-	fmt.Println(err)
 
 	if err == sql.ErrNoRows {
 		// Fresh install

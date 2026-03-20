@@ -63,7 +63,8 @@ func InitDb() (*sql.DB, error) {
 	// Ensure core tables exist
 	schema := `
 	CREATE TABLE IF NOT EXISTS schema_version (
-		version INTEGER NOT NULL DEFAULT 1
+		id INTEGER PRIMARY KEY CHECK (id = 1),
+		version INTEGER NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS clients (
