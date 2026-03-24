@@ -326,30 +326,35 @@ func StartTimer(clientName, taskName string) error {
 	return nil
 }
 
-func StopTimer(clientName, taskName string) error {
+// TODO: Cleanup
+func StopTimer() (string, string, error) {
 	db, err := InitDb()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	defer db.Close()
 
 	var startTimeStr string
 	var taskID sql.NullInt64
 	var clientID int
+	var clientName string
+	var taskName sql.NullString
 
 	err = db.QueryRow(`
-		SELECT client_id, task_id, start_time
-		FROM active_timer
-		WHERE id = 1
-	`).Scan(&clientID, &taskID, &startTimeStr)
+		SELECT timer.client_id, timer.task_id, timer.start_time, clients.name, tasks.name
+		FROM active_timer as timer
+		JOIN clients ON clients.id = timer.client_id
+		LEFT JOIN tasks ON tasks.id = timer.task_id
+		WHERE timer.id = 1
+	`).Scan(&clientID, &taskID, &startTimeStr, &clientName, &taskName)
 
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	startTime, err := time.Parse(time.RFC3339, startTimeStr)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	endTime := time.Now().UTC()
@@ -359,47 +364,49 @@ func StopTimer(clientName, taskName string) error {
 	if minutes <= 0 {
 		_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
 		if err != nil {
-			return err
+			return "", "", err
 		}
 
-		return fmt.Errorf("Timer running for less than 1 minute, no time allocated")
+		return "", "", fmt.Errorf("Timer running for less than 1 minute, no time allocated")
 	}
 
 	var finalTaskID int
+	var finalTaskName string
 
 	if !taskID.Valid {
-		taskName, err = SelectTaskForClient(clientName)
+		finalTaskName, err = SelectTaskForClient(clientName)
 		if err != nil {
-			return err
+			return "", "", err
 		}
 
 		err = db.QueryRow(`
 			SELECT id FROM tasks
 			WHERE name = ?
 			AND client_id = ?
-		`, taskName, clientID).Scan(&finalTaskID)
+		`, finalTaskName, clientID).Scan(&finalTaskID)
 
 		if err == sql.ErrNoRows {
 			res, err := db.Exec(`
 				INSERT INTO tasks (client_id, name, minutes)
 				VALUES (?, ?, 0)
-			`, clientID, taskName)
+			`, clientID, finalTaskName)
 			if err != nil {
-				return err
+				return "", "", err
 			}
 
 			id, err := res.LastInsertId()
 			if err != nil {
-				return err
+				return "", "", err
 			}
 
 			finalTaskID = int(id)
 
 		} else if err != nil {
-			return err
+			return "", "", err
 		}
 	} else {
 		finalTaskID = int(taskID.Int64)
+		finalTaskName = string(taskName.String)
 	}
 
 	_, err = db.Exec(`
@@ -412,7 +419,7 @@ func StopTimer(clientName, taskName string) error {
 		minutes,
 	)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	_, err = db.Exec(`
@@ -421,15 +428,15 @@ func StopTimer(clientName, taskName string) error {
 		WHERE id = ?
 	`, minutes, finalTaskID)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
-	return nil
+	return clientName, finalTaskName, nil
 }
 
 func SelectTaskForClient(clientName string) (string, error) {
@@ -463,5 +470,39 @@ func SelectTaskForClient(clientName string) (string, error) {
 	}
 
 	fmt.Printf("Selected task: %s \n", result)
+	return result, nil
+}
+
+func SelectClientForTimer() (string, error) {
+	clients, err := GetAll()
+	if err != nil {
+		return "", err
+	}
+	index := -1
+	clientNames := []string{}
+	for name := range clients {
+		clientNames = append(clientNames, name)
+	}
+	prompt := promptui.SelectWithAdd{
+		Label:    "Select client associated with timer",
+		Items:    clientNames,
+		AddLabel: "New Client",
+	}
+	index, result, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+
+	if index == -1 {
+		err = AddNewClient(result)
+		if err != nil {
+			return "", err
+		}
+
+		fmt.Printf("Created new client: %s \n", result)
+		return result, nil
+	}
+
+	fmt.Printf("Selected Client: %s \n", result)
 	return result, nil
 }

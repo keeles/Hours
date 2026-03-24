@@ -5,7 +5,6 @@ import (
 
 	"github.com/alecthomas/kong"
 	db "github.com/keeles/hours/v2/internal/database"
-	"github.com/keeles/hours/v2/internal/lib"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
@@ -20,22 +19,12 @@ func (o Options) Run(ctx *kong.Context) error {
 		return nil
 	}
 
-	client := o.Client
-	if client == "" {
-		clientName, exists := lib.GetClientNameForCurrentDirectory()
-		if !exists {
-			fmt.Println("No client associated with current directory")
-			return nil
-		}
-		client = clientName
-	}
-
-	err = db.StopTimer(client, o.Task)
+	client, task, err := db.StopTimer()
 	if err != nil {
-		fmt.Print(err)
+		fmt.Printf("Error stopping timer: %s\n", err)
 		return nil
 	}
 
-	fmt.Printf("Timer for %s has been stopped.", client)
+	fmt.Printf("Timer for %s has been stopped. Time allocated to %s\n", client, task)
 	return nil
 }
