@@ -76,7 +76,7 @@ func InitDb() (*sql.DB, error) {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		client_id INTEGER NOT NULL,
 		name TEXT NOT NULL,
-		minutes INTEGER DEFAULT 0,
+		minutes INTEGER DEFAULT 0 CHECK (minutes >= 0),
 		FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
 		UNIQUE(id, name)
 	);
@@ -96,7 +96,7 @@ func InitDb() (*sql.DB, error) {
 		task_id INTEGER NOT NULL,
 		start_time TEXT NOT NULL,
 		end_time TEXT NOT NULL,
-		minutes INTEGER NOT NULL,
+		minutes INTEGER NOT NULL CHECK (minutes >= 0),
 		FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 	);
 	`

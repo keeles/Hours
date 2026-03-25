@@ -9,7 +9,7 @@ func RunMigrations(db *sql.DB, current int) error {
 	if current < 2 {
 		// v1 stored hours instead of minutes
 		_, err := db.Exec(`
-			ALTER TABLE tasks ADD COLUMN minutes INTEGER DEFAULT 0;
+			ALTER TABLE tasks ADD COLUMN minutes INTEGER DEFAULT 0 CHECK (minutes >= 0);
 		`)
 		if err != nil {
 			return err
@@ -48,8 +48,7 @@ func EnsureSchemaVersion(db *sql.DB) error {
 	}
 
 	if version < SchemaVersion {
-		fmt.Println("Old database version detected, running migrations")
-		fmt.Println(version)
+		fmt.Printf("Old database version (%d) detected, running migrations\n", version)
 		return RunMigrations(db, version)
 	}
 

@@ -25,7 +25,7 @@ type Hours struct {
 	Task     task.Options     `cmd:"" aliases:"t" help:"Add new task to client - hours task <client-name> <task-name>"`
 	Time     time.Options     `cmd:"" aliases:"t" help:"Show the active timer"`
 	Get      get.Options      `cmd:"" aliases:"g" help:"Get the tasks for a given client name"`
-	Add      add.Options      `cmd:"" aliases:"a" help:"Add hours to an existing project - hours add <client-name> <task> <hours>"`
+	Add      add.Options      `cmd:"" aliases:"a" help:"Add hours to an existing project, default is minutes | Use flag --hours to record hours"`
 	Remove   remove.Options   `cmd:"" aliases:"rm" help:"Remove hours from an existing project - hours remove <client-name> <task> <hours>"`
 	List     list.Options     `cmd:"" aliases:"ls" help:"List all projects with hour tracking"`
 	Delete   delete.Options   `cmd:"" aliases:"d" help:"Delete a client and ALL tasks - hours delete <client-name>"`

@@ -193,13 +193,16 @@ func UpdateTaskMinutes(clientName, taskName string, newMinutes float32, subtract
 		query = `
 			UPDATE tasks 
 			SET minutes = minutes - ? 
-			WHERE name = ? and client_id = (SELECT id FROM clients WHERE name = ?);
+			WHERE name = ? 
+			AND client_id = (SELECT id FROM clients WHERE name = ?)
+			AND minutes - ? >= 0;
 		`
 	} else {
 		query = `
 			UPDATE tasks 
 			SET minutes = minutes + ? 
-			WHERE name = ? and client_id = (SELECT id FROM clients WHERE name = ?);
+			WHERE name = ? 
+			AND client_id = (SELECT id FROM clients WHERE name = ?);
 		`
 	}
 
