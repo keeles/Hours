@@ -231,7 +231,11 @@ func GetTimer() (Timer, bool, error) {
 	var task sql.NullString
 
 	err = db.QueryRow(`
-		SELECT a.start_time, c.name, t.name FROM active_timer AS a LEFT JOIN clients AS c ON a.client_id = c.id LEFT JOIN tasks as t on a.task_id = t.id
+		SELECT a.start_time, c.name, t.name 
+		FROM active_timer AS a 
+		LEFT JOIN clients AS c 
+		ON a.client_id = c.id 
+		LEFT JOIN tasks as t on a.task_id = t.id
 	`).Scan(&startTime, &client, &task)
 
 	if err == sql.ErrNoRows {
@@ -326,7 +330,6 @@ func StartTimer(clientName, taskName string) error {
 	return nil
 }
 
-// TODO: Cleanup
 func StopTimer() (string, string, error) {
 	db, err := InitDb()
 	if err != nil {
@@ -339,104 +342,30 @@ func StopTimer() (string, string, error) {
 	var clientID int
 	var clientName string
 	var taskName sql.NullString
-
-	err = db.QueryRow(`
+	activeTimerQuery := `
 		SELECT timer.client_id, timer.task_id, timer.start_time, clients.name, tasks.name
 		FROM active_timer as timer
 		JOIN clients ON clients.id = timer.client_id
 		LEFT JOIN tasks ON tasks.id = timer.task_id
 		WHERE timer.id = 1
-	`).Scan(&clientID, &taskID, &startTimeStr, &clientName, &taskName)
+	`
 
+	err = db.QueryRow(activeTimerQuery).Scan(&clientID, &taskID, &startTimeStr, &clientName, &taskName)
 	if err != nil {
 		return "", "", err
 	}
 
-	startTime, err := time.Parse(time.RFC3339, startTimeStr)
+	validTaskID, validTaskName, err := verifyTaskId(db, taskID, taskName, clientName, clientID)
 	if err != nil {
 		return "", "", err
 	}
 
-	endTime := time.Now().UTC()
-	duration := endTime.Sub(startTime)
-	minutes := int(duration.Minutes())
-
-	if minutes <= 0 {
-		_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
-		if err != nil {
-			return "", "", err
-		}
-
-		return "", "", fmt.Errorf("Timer running for less than 1 minute, no time allocated")
-	}
-
-	var finalTaskID int
-	var finalTaskName string
-
-	if !taskID.Valid {
-		finalTaskName, err = SelectTaskForClient(clientName)
-		if err != nil {
-			return "", "", err
-		}
-
-		err = db.QueryRow(`
-			SELECT id FROM tasks
-			WHERE name = ?
-			AND client_id = ?
-		`, finalTaskName, clientID).Scan(&finalTaskID)
-
-		if err == sql.ErrNoRows {
-			res, err := db.Exec(`
-				INSERT INTO tasks (client_id, name, minutes)
-				VALUES (?, ?, 0)
-			`, clientID, finalTaskName)
-			if err != nil {
-				return "", "", err
-			}
-
-			id, err := res.LastInsertId()
-			if err != nil {
-				return "", "", err
-			}
-
-			finalTaskID = int(id)
-
-		} else if err != nil {
-			return "", "", err
-		}
-	} else {
-		finalTaskID = int(taskID.Int64)
-		finalTaskName = string(taskName.String)
-	}
-
-	_, err = db.Exec(`
-		INSERT INTO time_entries (task_id, start_time, end_time, minutes)
-		VALUES (?, ?, ?, ?)
-	`,
-		finalTaskID,
-		startTime.Format(time.RFC3339),
-		endTime.Format(time.RFC3339),
-		minutes,
-	)
+	err = allocateTimeToTask(db, startTimeStr, validTaskID)
 	if err != nil {
 		return "", "", err
 	}
 
-	_, err = db.Exec(`
-		UPDATE tasks
-		SET minutes = minutes + ?
-		WHERE id = ?
-	`, minutes, finalTaskID)
-	if err != nil {
-		return "", "", err
-	}
-
-	_, err = db.Exec(`DELETE FROM active_timer WHERE id = 1`)
-	if err != nil {
-		return "", "", err
-	}
-
-	return clientName, finalTaskName, nil
+	return clientName, validTaskName, nil
 }
 
 func SelectTaskForClient(clientName string) (string, error) {
@@ -444,6 +373,7 @@ func SelectTaskForClient(clientName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	index := -1
 	taskNames := []string{}
 	for name := range tasks {

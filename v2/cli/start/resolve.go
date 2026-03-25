@@ -6,6 +6,10 @@ import (
 )
 
 func resolveClient(input string) (string, error) {
+	if exists, _ := db.ClientExists(input); exists {
+		return input, nil
+	}
+
 	if clientName, exists := lib.GetClientNameForCurrentDirectory(); exists {
 		return clientName, nil
 	}
@@ -14,5 +18,6 @@ func resolveClient(input string) (string, error) {
 	if err != nil {
 		return "", nil
 	}
+
 	return selected, nil
 }
