@@ -1,10 +1,11 @@
-package lib
+package database
 
 import (
 	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "modernc.org/sqlite"
 )
@@ -18,6 +19,14 @@ type Project struct {
 
 type Tasks map[string]int
 
+type Timer struct {
+	ClientName string
+	TaskName   *string // pointer = optional
+	StartTime  time.Time
+}
+
+const SchemaVersion = 2
+
 func GetDBPath() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -25,6 +34,7 @@ func GetDBPath() (string, error) {
 	}
 
 	configDir := filepath.Join(home, ".config", "hours")
+
 	err = os.MkdirAll(configDir, 0755)
 	if err != nil {
 		return "", fmt.Errorf("failed to create $HOME/.config/hours directory for database storage")
@@ -36,7 +46,6 @@ func GetDBPath() (string, error) {
 func InitDb() (*sql.DB, error) {
 	dbPath, err := GetDBPath()
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -50,6 +59,7 @@ func InitDb() (*sql.DB, error) {
 		return nil, err
 	}
 
+	// Ensure core tables exist
 	schema := `
 	CREATE TABLE IF NOT EXISTS schema_version (
 		id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -62,16 +72,35 @@ func InitDb() (*sql.DB, error) {
 
 	CREATE TABLE IF NOT EXISTS clients (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT UNIQUE NOT NULL	
+		name TEXT UNIQUE NOT NULL
 	);
-	
+
 	CREATE TABLE IF NOT EXISTS tasks (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		client_id INTEGER NOT NULL,
 		name TEXT NOT NULL,
-		hours INTEGER DEFAULT 0,
+		minutes INTEGER DEFAULT 0 CHECK (minutes >= 0),
 		FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
-		UNIQUE(client_id, name)
+		UNIQUE(id, name)
+	);
+
+	-- Only ONE active timer allowed
+	CREATE TABLE IF NOT EXISTS active_timer (
+		id INTEGER PRIMARY KEY CHECK (id = 1),
+		client_id INTEGER NOT NULL,
+		task_id INTEGER,
+		start_time TEXT NOT NULL,
+		FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+		FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE SET NULL
+	);
+
+	CREATE TABLE IF NOT EXISTS time_entries (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		task_id INTEGER NOT NULL,
+		start_time TEXT NOT NULL,
+		end_time TEXT NOT NULL,
+		minutes INTEGER NOT NULL CHECK (minutes >= 0),
+		FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 	);
 	`
 

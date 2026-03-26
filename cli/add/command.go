@@ -1,14 +1,21 @@
 package add
 
 import (
-	"github.com/keeles/hours/internal/lib"
-	"github.com/keeles/hours/internal/logger"
+	db "github.com/keeles/hours/v2/internal/database"
+	"github.com/keeles/hours/v2/internal/logger"
 
 	"github.com/alecthomas/kong"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.UpdateTaskHours(o.Name, o.Task, o.NewHours, false)
+	amount := o.Amount
+
+	if o.Hours {
+		amount = amount * 60
+	}
+
+	err := db.UpdateTaskMinutes(o.Name, o.Task, amount, false)
+
 	if err != nil {
 		logger.ErrorWritingFile()
 		return nil

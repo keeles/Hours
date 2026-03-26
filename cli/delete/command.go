@@ -1,20 +1,17 @@
 package delete
 
 import (
-	"fmt"
-
 	"github.com/alecthomas/kong"
-	"github.com/keeles/hours/internal/lib"
-	"github.com/keeles/hours/internal/logger"
+	db "github.com/keeles/hours/v2/internal/database"
+	"github.com/keeles/hours/v2/internal/logger"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.DeleteClient(o.Name)
+	err := db.DeleteClient(o.Name, o.Force)
 	if err != nil {
 		logger.ErrorWritingFile()
 		return nil
 	}
 
-	fmt.Printf("Deleted Client: %v \n", o.Name)
 	return nil
 }

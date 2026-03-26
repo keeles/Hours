@@ -3,19 +3,27 @@ package remove
 import (
 	"fmt"
 
-	"github.com/keeles/hours/internal/lib"
-	"github.com/keeles/hours/internal/logger"
+	db "github.com/keeles/hours/v2/internal/database"
+	"github.com/keeles/hours/v2/internal/logger"
 
 	"github.com/alecthomas/kong"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.UpdateTaskHours(o.Name, o.Task, o.HoursToRemove, true)
+	amount := o.Amount
+
+	if o.Hours {
+		amount = amount * 60
+	}
+
+	err := db.UpdateTaskMinutes(o.Name, o.Task, amount, true)
 	if err != nil {
+		fmt.Println(err)
 		logger.ErrorWritingFile()
 		return nil
 	}
 
-	fmt.Printf("Removed %v hours from %s", o.HoursToRemove, o.Task)
+	fmt.Printf("Removed %v minutes from %s", amount, o.Task)
+
 	return nil
 }

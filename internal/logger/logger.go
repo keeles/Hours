@@ -3,8 +3,9 @@ package logger
 import (
 	"fmt"
 	"os"
+	"time"
 
-	"github.com/keeles/hours/internal/lib"
+	db "github.com/keeles/hours/v2/internal/database"
 )
 
 func ProjectNotFound(name string) {
@@ -12,18 +13,20 @@ func ProjectNotFound(name string) {
 }
 
 func FileNotExists() {
-	pathname, err := lib.GetDBPath()
+	pathname, err := db.GetDBPath()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v", err)
 	}
+
 	fmt.Fprintf(os.Stderr, "Error, could not find database at %v", pathname)
 }
 
 func ErrorWritingFile() {
-	pathname, err := lib.GetDBPath()
+	pathname, err := db.GetDBPath()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v", err)
 	}
+
 	fmt.Fprintf(os.Stderr, "Error, could not write to database at %v", pathname)
 }
 
@@ -33,4 +36,16 @@ func ProjectAlreadyExists(name string) {
 
 func PrintVersion(version string) {
 	fmt.Printf("Current Hours version: %v \n", version)
+}
+
+func PrintTimer(clientName string, timer time.Time, taskName *string) {
+	endTime := time.Now().UTC()
+	duration := endTime.Sub(timer)
+	minutes := int(duration.Minutes())
+
+	fmt.Printf("Current Timer: %s - %d minutes \n", clientName, minutes)
+
+	if taskName != nil {
+		fmt.Printf("Task Selected: %d \n", taskName)
+	}
 }

@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
-	"github.com/keeles/hours/internal/lib"
-	"github.com/keeles/hours/internal/logger"
+	db "github.com/keeles/hours/v2/internal/database"
+	"github.com/keeles/hours/v2/internal/logger"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.DeleteTask(o.Client, o.Task)
+	err := db.DeleteTask(o.Client, o.Task)
 	if err != nil {
 		logger.ProjectNotFound(o.Task)
 		return nil

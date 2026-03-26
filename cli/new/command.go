@@ -3,17 +3,18 @@ package new
 import (
 	"fmt"
 
-	"github.com/keeles/hours/internal/lib"
+	db "github.com/keeles/hours/v2/internal/database"
 
 	"github.com/alecthomas/kong"
 )
 
 func (o Options) Run(ctx *kong.Context) error {
-	err := lib.AddNewClient(o.Name)
+	err := db.AddNewClient(o.Name)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("New Project Created: %s\n", o.Name)
+
 	return nil
 }

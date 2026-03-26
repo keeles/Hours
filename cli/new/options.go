@@ -1,5 +1,6 @@
 package new
 
 type Options struct {
-	Name string `arg:"" help:"Name of the project"`
+	Name string `arg:"" help:"Name of the client or category"`
 }
+
