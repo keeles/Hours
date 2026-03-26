@@ -166,3 +166,7 @@ List linked directories
 ```bash
 hours config list
 ```
+
+## License
+
+MIT

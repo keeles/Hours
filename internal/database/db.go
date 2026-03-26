@@ -33,8 +33,7 @@ func GetDBPath() (string, error) {
 		return "", fmt.Errorf("failed to determine home directory - please set $HOME environment variable")
 	}
 
-	// TODO: remove v2 when publishing final version
-	configDir := filepath.Join(home, ".config", "hours", "v2")
+	configDir := filepath.Join(home, ".config", "hours")
 
 	err = os.MkdirAll(configDir, 0755)
 	if err != nil {
@@ -102,11 +101,6 @@ func InitDb() (*sql.DB, error) {
 	`
 
 	_, err = db.Exec(schema)
-	if err != nil {
-		return nil, err
-	}
-
-	err = EnsureSchemaVersion(db)
 	if err != nil {
 		return nil, err
 	}
