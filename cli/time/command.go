@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
-	db "github.com/keeles/hours/v2/internal/database"
+	db "github.com/keeles/hours/internal/database"
 )
 
 func (o Options) Run(ctx *kong.Context) error {

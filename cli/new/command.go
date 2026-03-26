@@ -3,7 +3,7 @@ package new
 import (
 	"fmt"
 
-	db "github.com/keeles/hours/v2/internal/database"
+	db "github.com/keeles/hours/internal/database"
 
 	"github.com/alecthomas/kong"
 )

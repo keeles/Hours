@@ -1,4 +1,4 @@
-module github.com/keeles/hours/v2
+module github.com/keeles/hours
 
 go 1.25.4
 

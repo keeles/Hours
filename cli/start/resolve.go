@@ -1,8 +1,8 @@
 package start
 
 import (
-	db "github.com/keeles/hours/v2/internal/database"
-	"github.com/keeles/hours/v2/internal/lib"
+	db "github.com/keeles/hours/internal/database"
+	"github.com/keeles/hours/internal/lib"
 )
 
 func resolveClient(input string) (string, error) {

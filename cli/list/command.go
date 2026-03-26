@@ -3,9 +3,9 @@ package list
 import (
 	"fmt"
 
-	db "github.com/keeles/hours/v2/internal/database"
-	"github.com/keeles/hours/v2/internal/lib"
-	"github.com/keeles/hours/v2/internal/logger"
+	db "github.com/keeles/hours/internal/database"
+	"github.com/keeles/hours/internal/lib"
+	"github.com/keeles/hours/internal/logger"
 
 	"github.com/alecthomas/kong"
 )

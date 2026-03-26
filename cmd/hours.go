@@ -1,19 +1,19 @@
 package main
 
 import (
-	"github.com/keeles/hours/v2/cli/add"
-	"github.com/keeles/hours/v2/cli/complete"
-	"github.com/keeles/hours/v2/cli/config"
-	"github.com/keeles/hours/v2/cli/delete"
-	"github.com/keeles/hours/v2/cli/get"
-	"github.com/keeles/hours/v2/cli/list"
-	"github.com/keeles/hours/v2/cli/new"
-	"github.com/keeles/hours/v2/cli/remove"
-	"github.com/keeles/hours/v2/cli/start"
-	"github.com/keeles/hours/v2/cli/stop"
-	"github.com/keeles/hours/v2/cli/task"
-	"github.com/keeles/hours/v2/cli/time"
-	"github.com/keeles/hours/v2/cli/version"
+	"github.com/keeles/hours/cli/add"
+	"github.com/keeles/hours/cli/complete"
+	"github.com/keeles/hours/cli/config"
+	"github.com/keeles/hours/cli/delete"
+	"github.com/keeles/hours/cli/get"
+	"github.com/keeles/hours/cli/list"
+	"github.com/keeles/hours/cli/new"
+	"github.com/keeles/hours/cli/remove"
+	"github.com/keeles/hours/cli/start"
+	"github.com/keeles/hours/cli/stop"
+	"github.com/keeles/hours/cli/task"
+	"github.com/keeles/hours/cli/time"
+	"github.com/keeles/hours/cli/version"
 )
 
 type Hours struct {

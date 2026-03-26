@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	db "github.com/keeles/hours/v2/internal/database"
+	db "github.com/keeles/hours/internal/database"
 )
 
 func ProjectNotFound(name string) {

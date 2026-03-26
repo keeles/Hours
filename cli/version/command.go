@@ -1,7 +1,7 @@
 package version
 
 import (
-	"github.com/keeles/hours/v2/internal/logger"
+	"github.com/keeles/hours/internal/logger"
 
 	"github.com/alecthomas/kong"
 )
