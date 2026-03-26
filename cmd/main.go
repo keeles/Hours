@@ -9,6 +9,7 @@ import (
 
 func main() {
 	hours := &Hours{}
+
 	ctx := kong.Parse(
 		hours,
 		kong.Description("A tool for tracking hours via the command line."),
@@ -19,9 +20,10 @@ func main() {
 			NoExpandSubcommands: true,
 		}),
 		kong.Vars{
-			"versionNumber": "1.0.1",
+			"versionNumber": "2.0.0",
 		},
 	)
+
 	if err := ctx.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
