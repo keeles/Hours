@@ -26,14 +26,10 @@ func allocateTimeToTask(db *sql.DB, startTimeStr string, finalTaskID int) error 
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO time_entries (task_id, start_time, end_time, minutes)
+		INSERT INTO time_entries 
+		(task_id, start_time, end_time, minutes)
 		VALUES (?, ?, ?, ?)
-	`,
-		finalTaskID,
-		startTime.Format(time.RFC3339),
-		endTime.Format(time.RFC3339),
-		minutes,
-	)
+	`, finalTaskID, startTime.Format(time.RFC3339), endTime.Format(time.RFC3339), minutes)
 	if err != nil {
 		return err
 	}

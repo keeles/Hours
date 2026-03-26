@@ -34,5 +34,6 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	fmt.Printf("Starting timer for %s \n", client)
+
 	return nil
 }

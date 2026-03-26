@@ -9,6 +9,6 @@ import (
 func (o Options) Run(ctx *kong.Context) error {
 	current := ctx.Model.Vars()["versionNumber"]
 	logger.PrintVersion(current)
+
 	return nil
 }
-

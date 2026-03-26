@@ -24,5 +24,6 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	fmt.Printf("Removed %v minutes from %s", amount, o.Task)
+
 	return nil
 }

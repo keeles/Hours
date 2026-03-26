@@ -15,5 +15,6 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	fmt.Printf("New Project Created: %s\n", o.Name)
+
 	return nil
 }

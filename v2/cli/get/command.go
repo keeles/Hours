@@ -16,9 +16,11 @@ func (o Options) Run(ctx *kong.Context) error {
 		logger.ProjectNotFound(o.Name)
 		return nil
 	}
+
 	for name, minutes := range tasks {
 		hours := lib.MinutesToRoundedHours(minutes)
 		fmt.Printf("%v: %d minutes (%.2f hours)\n", name, minutes, hours)
 	}
+
 	return nil
 }

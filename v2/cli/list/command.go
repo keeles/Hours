@@ -26,5 +26,6 @@ func (o Options) Run(ctx *kong.Context) error {
 		}
 		fmt.Println("")
 	}
+
 	return nil
 }

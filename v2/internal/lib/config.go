@@ -17,6 +17,7 @@ func GetConfigPath() string {
 	if err != nil {
 		return ".hours.json"
 	}
+
 	configDir := filepath.Join(home, ".config", "hours")
 	os.MkdirAll(configDir, 0755)
 
@@ -78,6 +79,7 @@ func WriteFile(data Config) error {
 	}
 
 	pathname := GetConfigPath()
+
 	return os.WriteFile(pathname, results, 0666)
 }
 
@@ -145,6 +147,7 @@ func GetClientNameForCurrentDirectory() (string, bool) {
 		fmt.Println("Error reading current directory")
 		return "", false
 	}
+
 	config, err := ReadFile()
 	if err != nil {
 		return "", false
@@ -161,5 +164,6 @@ func GetClientNameForCurrentDirectory() (string, bool) {
 	}
 
 	fmt.Printf("No client associated with %s \n", currentDirectory)
+
 	return "", false
 }

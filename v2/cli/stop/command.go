@@ -26,5 +26,6 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	fmt.Printf("Timer for %s has been stopped. Time allocated to %s\n", client, task)
+
 	return nil
 }

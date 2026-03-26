@@ -29,5 +29,6 @@ func (o Options) Run(ctx *kong.Context) error {
 		fmt.Printf("Task: %s \n", *timer.TaskName)
 
 	}
+
 	return nil
 }

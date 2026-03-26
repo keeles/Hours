@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/manifoldco/promptui"
@@ -16,6 +17,7 @@ func AddNewClient(name string) error {
 	defer db.Close()
 
 	_, err = db.Exec("INSERT INTO clients (name) VALUES (?)", name)
+
 	return err
 }
 
@@ -33,6 +35,7 @@ func AddNewTask(clientName, name string) error {
 	}
 
 	_, err = db.Exec("INSERT INTO tasks (name, client_id) VALUES (?, ?)", name, clientId)
+
 	return err
 }
 
@@ -158,14 +161,37 @@ func DeleteTask(clientName, taskName string) error {
 	return nil
 }
 
-func DeleteClient(clientName string) error {
+func DeleteClient(clientName string, force bool) error {
 	db, err := InitDb()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	result, err := db.Exec("DELETE FROM clients WHERE name = ?", clientName)
+	var id int
+	var name string
+
+	err = db.QueryRow("SELECT id, name FROM clients WHERE name = ?", clientName).Scan(&id, &name)
+	if err != nil {
+		return fmt.Errorf("client '%s' not found", clientName)
+	}
+
+	if !force {
+		confirmed, err := ConfirmDeleteClient(name)
+		if err != nil {
+			fmt.Println("Confirm Failure")
+			fmt.Println(err)
+			return err
+		}
+
+		if !confirmed {
+			fmt.Printf("Delete client %s cancelled\n", name)
+			return nil
+		}
+
+	}
+
+	result, err := db.Exec("DELETE FROM clients WHERE id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -174,10 +200,12 @@ func DeleteClient(clientName string) error {
 	if err != nil {
 		return err
 	}
+
 	if rows == 0 {
-		return fmt.Errorf("client '%s' not found", clientName)
+		return fmt.Errorf("Error deleting client '%s'\n", name)
 	}
 
+	fmt.Printf("Deleted Client: %v \n", name)
 	return nil
 }
 
@@ -403,6 +431,7 @@ func SelectTaskForClient(clientName string) (string, error) {
 	}
 
 	fmt.Printf("Selected task: %s \n", result)
+
 	return result, nil
 }
 
@@ -411,16 +440,18 @@ func SelectClientForTimer() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	index := -1
+
 	clientNames := []string{}
 	for name := range clients {
 		clientNames = append(clientNames, name)
 	}
+
 	prompt := promptui.SelectWithAdd{
 		Label:    "Select client associated with timer",
 		Items:    clientNames,
 		AddLabel: "New Client",
 	}
+
 	index, result, err := prompt.Run()
 	if err != nil {
 		return "", err
@@ -437,5 +468,31 @@ func SelectClientForTimer() (string, error) {
 	}
 
 	fmt.Printf("Selected Client: %s \n", result)
+
 	return result, nil
+}
+
+func ConfirmDeleteClient(name string) (bool, error) {
+	var b strings.Builder
+	b.WriteString("Delete Client: ")
+	b.WriteString(name)
+
+	choices := []string{"Delete", "Cancel"}
+
+	prompt := promptui.Select{
+		Label: b.String(),
+		Items: choices,
+	}
+
+	index, _, err := prompt.Run()
+	if err != nil {
+		fmt.Println("Prompt Error")
+		return false, err
+	}
+
+	if index == 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
