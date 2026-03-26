@@ -14,7 +14,7 @@ func (o Options) Run(ctx *kong.Context) error {
 		return err
 	}
 
-	fmt.Printf("New Project Created: %s\n", o.Name)
+	fmt.Printf("New Client/Category Created: %s\n", o.Name)
 
 	return nil
 }

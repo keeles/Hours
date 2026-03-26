@@ -234,7 +234,7 @@ func UpdateTaskMinutes(clientName, taskName string, newMinutes float32, subtract
 		`
 	}
 
-	result, err := db.Exec(query, newMinutes, taskName, clientName)
+	result, err := db.Exec(query, newMinutes, taskName, clientName, newMinutes)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func UpdateTaskMinutes(clientName, taskName string, newMinutes float32, subtract
 		return err
 	}
 	if rows == 0 {
-		return fmt.Errorf("client '%s' not found", clientName)
+		return fmt.Errorf("Error, please ensure client '%s' exists and total minutes >= 0", clientName)
 	}
 
 	return nil
