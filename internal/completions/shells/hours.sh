@@ -26,7 +26,7 @@ _hours_completion() {
     config)
       case "$cword" in
         2)
-          mapfile -t COMPREPLY < <(compgen -W "add-directory remove-directory list" -- "$cur")
+          mapfile -t COMPREPLY < <(compgen -W "add-directory remove-directory list completion" -- "$cur")
           ;;
         3)
           local command="${words[2]}"
@@ -43,4 +43,4 @@ _hours_completion() {
 }
 
 complete -r hours 2>/dev/null
-complete -F _hours_completion hourscomplete -F _hours_completion hours
+complete -F _hours_completion hours

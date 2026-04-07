@@ -17,7 +17,7 @@ case $state in
         _values "clients" $(hours ls -c)
         ;;
       config)
-        _values "config commands" add-directory remove-directory list
+        _values "config commands" add-directory remove-directory list completion
         ;;
     esac
     ;;

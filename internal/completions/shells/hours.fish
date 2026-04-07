@@ -16,7 +16,7 @@ end
 
 # Config subcommands
 complete -c hours -n "__fish_seen_subcommand_from config" \
-  -a "add-directory remove-directory list"
+  -a "add-directory remove-directory list completion"
 
 # Config client arg (except list)
 complete -c hours -n "__fish_seen_subcommand_from config; and not __fish_seen_subcommand_from list" \
