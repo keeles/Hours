@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	completion "github.com/keeles/hours/internal/completions"
 )
 
 type Config struct {
@@ -166,4 +168,33 @@ func GetClientNameForCurrentDirectory() (string, bool) {
 	fmt.Printf("No client associated with %s \n", currentDirectory)
 
 	return "", false
+}
+
+func PrintCompletionFile(shell string) error {
+	var filepath string
+
+	switch shell {
+	case "bash":
+		filepath = "shells/hours.sh"
+	case "zsh":
+		filepath = "shells/_hours"
+	case "fish":
+		filepath = "shells/hours.fish"
+	default:
+		filepath = ""
+	}
+
+	file, err := completion.Files.Open(filepath)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(os.Stdout, file)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

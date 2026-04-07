@@ -41,3 +41,6 @@ _hours_completion() {
       ;;
   esac
 }
+
+complete -r hours 2>/dev/null
+complete -F _hours_completion hourscomplete -F _hours_completion hours
