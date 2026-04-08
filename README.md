@@ -167,6 +167,19 @@ List linked directories
 hours config list
 ```
 
+#### Completion
+
+Print shell completion file to console
+
+- Alias: comp
+- Supported Shells: bash | zsh | fish
+
+```bash
+hours config comp bash
+hours config comp zsh
+hours config comp fish
+```
+
 ## License
 
 MIT

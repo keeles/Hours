@@ -63,3 +63,18 @@ func (o ListOptions) Run(ctx *kong.Context) error {
 	}
 	return nil
 }
+
+func (o CompletionOptions) Run(ctx *kong.Context) error {
+	if o.Shell == "" {
+		fmt.Println("Shell Param required\nProvide from options bash, zsh or fish")
+		return nil
+	}
+
+	err := lib.PrintCompletionFile(o.Shell)
+	if err != nil {
+		fmt.Println("Invalid Shell Option\nProvide from options bash, zsh or fish")
+		return nil
+	}
+
+	return nil
+}

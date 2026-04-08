@@ -19,6 +19,11 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	for client, tasks := range data {
+		if o.Clients {
+			fmt.Printf("%v\n", client)
+			continue
+		}
+
 		fmt.Printf("%v: \n", client)
 		for task, minutes := range tasks {
 			hours := lib.MinutesToRoundedHours(minutes)

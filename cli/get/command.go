@@ -18,6 +18,11 @@ func (o Options) Run(ctx *kong.Context) error {
 	}
 
 	for name, minutes := range tasks {
+		if o.Task {
+			fmt.Printf("%v\n", name)
+			continue
+		}
+
 		hours := lib.MinutesToRoundedHours(minutes)
 		fmt.Printf("%v: %d minutes (%.2f hours)\n", name, minutes, hours)
 	}
