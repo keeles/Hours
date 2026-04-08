@@ -16,8 +16,12 @@ end
 
 # Config subcommands
 complete -c hours -n "__fish_seen_subcommand_from config" \
-  -a "add-directory remove-directory list completion"
+  -a "add-directory remove-directory add-dir rm-dir list completion comp"
 
-# Config client arg (except list)
-complete -c hours -n "__fish_seen_subcommand_from config; and not __fish_seen_subcommand_from list" \
+# Config → client (ONLY for specific subcommands)
+complete -c hours -n "__fish_seen_subcommand_from config; and __fish_seen_subcommand_from add-directory remove-directory add-dir rm-dir" \
   -a "(hours ls -c)"
+
+# Config → shell completion types
+complete -c hours -n "__fish_seen_subcommand_from config; and __fish_seen_subcommand_from completion comp" \
+  -a "bash fish zsh"

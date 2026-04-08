@@ -4,27 +4,39 @@ local state
 
 _arguments \
   '1:command:->cmds' \
-  '2:client:->clients' \
-  '3:task:->tasks'
+  '2:arg:->second' \
+  '3:arg:->third'
 
 case $state in
   cmds)
-    _values "commands" add complete config delete get list new remove start stop task time version
+    _values "commands" add complete config delete get list new remove rm start stop task time version
     ;;
-  clients)
+    
+  second)
     case $words[2] in
       new|delete|task|get|add|remove|rm|complete|start)
         _values "clients" $(hours ls -c)
         ;;
       config)
-        _values "config commands" add-directory remove-directory list completion
+        _values "config commands" add-directory remove-directory add-dir rm-dir list completion comp
         ;;
     esac
     ;;
-  tasks)
+    
+  third)
     case $words[2] in
       add|remove|rm|complete|start)
         _values "tasks" $(hours get $words[3] -t)
+        ;;
+      config)
+        case $words[3] in
+          add-directory|remove-directory|add-dir|rm-dir)
+            _values "clients" $(hours ls -c)
+            ;;
+          completion|comp)
+            _values "shells" bash fish zsh
+            ;;
+        esac
         ;;
     esac
     ;;

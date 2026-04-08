@@ -30,14 +30,25 @@ _hours_completion() {
           ;;
         3)
           local command="${words[2]}"
-          if [ "$command" != "list" ]; then
-            mapfile -t COMPREPLY < <(compgen -W "$(hours ls -c)" -- "$cur")
-          fi
+          case "$command" in
+            add-directory | remove-directory | add-dir | rm-dir)
+              mapfile -t COMPREPLY < <(compgen -W "$(hours ls -c)" -- "$cur")
+              ;;
+          esac
+          case "$command" in
+            completion | comp)
+              mapfile -t COMPREPLY < <(compgen -W "bash fish zsh" -- "$cur")
+              ;;
+          esac
           ;;
       esac
       ;;
     *)
-      mapfile -t COMPREPLY < <(compgen -W "add complete config delete get list new remove start stop task time version" -- "$cur")
+      case $cword in
+        1)
+          mapfile -t COMPREPLY < <(compgen -W "add complete config delete get list new remove start stop task time version" -- "$cur")
+          ;;
+      esac
       ;;
   esac
 }
